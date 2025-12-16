@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Video Delay</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 12px; }
+    .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    video, canvas { width: 100%; max-width: 520px; border-radius: 14px; }
+    button { padding: 10px 14px; font-size: 16px; border-radius: 12px; }
+    input[type="range"] { width: 200px; }
+    .small { opacity: 0.75; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <h2>Video Delay</h2>
+
+  <div class="row">
+    <button id="start">Start</button>
+    <button id="pause">Freeze</button>
+
+    <label>Delay:
+      <input id="delay" type="range" min="1" max="30" value="10" />
+      <b><span id="dLabel">10</span>s</b>
+    </label>
+  </div>
+
+  <p class="small">Tipp: Handy quer auf Stativ. „Freeze“ hält das delayed Bild an.</p>
+
+  <p>Live (zum Vergleich):</p>
+  <video id="live" playsinline autoplay muted></video>
+
+  <p>Delayed Output:</p>
+  <canvas id="out"></canvas>
+
+<script>
+const live = document.getElementById('live');
+const out = document.getElementById('out');
+const ctx = out.getContext('2d');
+
+const delaySlider = document.getElementById('delay');
+const dLabel = document.getElementById('dLabel');
+dLabel.textContent = delaySlider.value;
+
+let running = false;
+let frozen = false;
+
+let frames = [];     // Array of ImageBitmap (effizienter als ImageData)
+let times = [];      // Zeitstempel in ms
+
+const targetFps = 15;
+const frameInterval = 1000 / targetFps;
+
+delaySlider.oninput = () => dLabel.textContent = delaySlider.value;
+
+document.getElementById('pause').onclick = () => {
+  frozen = !frozen;
+  document.getElementById('pause').textContent = frozen ? "Unfreeze" : "Freeze";
+};
+
+document.getElementById('start').onclick = async () => {
+  if (running) return;
+  running = true;
+
+  const stream = await navigator.mediaDevices.getUserMedia({
+    video: { facingMode: "user" }, audio: false
+  });
+
+  live.srcObject = stream;
+  await new Promise(r => live.onloadedmetadata = r);
+
+  out.width = live.videoWidth;
+  out.height = live.videoHeight;
+
+  // Capture loop
+  let last = performance.now();
+
+  async function tick(now) {
+    if (!running) return;
+
+    if (now - last >= frameInterval) {
+      last = now;
+
+      if (!frozen) {
+        // Live frame -> ImageBitmap
+        const bmp = await createImageBitmap(live);
+        frames.push(bmp);
+        times.push(Date.now());
+
+        // Buffer begrenzen (Delay + ein bisschen extra)
+        const delaySec = Number(delaySlider.value);
+        const maxFrames = Math.ceil((delaySec + 2) * targetFps);
+
+        while (frames.length > maxFrames) {
+          frames.shift().close?.();
+          times.shift();
+        }
+
+        // Delayed frame finden
+        const targetTime = Date.now() - delaySec * 1000;
+        let idx = times.findIndex(t => t >= targetTime);
+        if (idx === -1) idx = 0;
+
+        ctx.drawImage(frames[idx], 0, 0, out.width, out.height);
+      }
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  requestAnimationFrame(tick);
+};
+</script>
+</body>
+</html>
