@@ -2,115 +2,281 @@
 <html lang="de">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Video Delay</title>
   <style>
-    body { font-family: system-ui, sans-serif; margin: 12px; }
-    .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-    video, canvas { width: 100%; max-width: 520px; border-radius: 14px; }
-    button { padding: 10px 14px; font-size: 16px; border-radius: 12px; }
-    input[type="range"] { width: 200px; }
-    .small { opacity: 0.75; font-size: 13px; }
+    :root{
+      --bg:#0b0f17; --card:#111827; --muted:#9ca3af; --text:#e5e7eb;
+      --accent:#60a5fa; --border:#243244;
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; padding:14px; background:var(--bg); color:var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    }
+    .wrap{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+    .card{
+      background:var(--card); border:1px solid var(--border);
+      border-radius:var(--radius); padding:12px;
+    }
+    h1{font-size:18px;margin:0 0 8px 0}
+    .muted{color:var(--muted); font-size:13px; line-height:1.35}
+    .controls{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    button{
+      background:#1f2937; color:var(--text); border:1px solid var(--border);
+      padding:10px 12px; border-radius:14px; font-size:14px;
+    }
+    button.primary{border-color:#2d4a70; background:#0f2742}
+    button:active{transform:translateY(1px)}
+    label{display:flex; align-items:center; gap:10px}
+    input[type="range"]{width:220px}
+    .pill{padding:6px 10px;border:1px solid var(--border);border-radius:999px;font-size:13px;color:var(--muted)}
+    .stage{
+      position:relative; overflow:hidden; border-radius:var(--radius);
+      border:1px solid var(--border); background:#000;
+    }
+    canvas{width:100%; height:auto; display:block; background:#000}
+    .overlay{
+      position:absolute; inset:auto 10px 10px 10px;
+      display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between; align-items:center;
+      pointer-events:none;
+    }
+    .overlay > *{pointer-events:auto}
+    .miniLive{
+      position:absolute; top:10px; right:10px;
+      width:min(160px, 38vw); aspect-ratio: 3 / 4;
+      border-radius:14px; overflow:hidden; border:1px solid var(--border);
+      background:#000;
+    }
+    video{width:100%; height:100%; object-fit:cover; display:block}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between}
+    .status{font-size:13px;color:var(--muted)}
+    .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; opacity:.8}
+    .hidden{display:none !important;}
   </style>
 </head>
 <body>
-  <h2>Video Delay</h2>
+  <div class="wrap">
+    <div class="card">
+      <h1>Video Delay (Bowling)</h1>
+      <div class="muted">
+        Tipp: Handy quer auf Stativ. Unten siehst du den verzögerten Wurf, rechts oben klein das Live-Bild.
+      </div>
+    </div>
 
-  <div class="row">
-    <button id="start">Start</button>
-    <button id="pause">Freeze</button>
+    <div class="card">
+      <div class="controls">
+        <button id="start" class="primary">Start</button>
+        <button id="freeze">Freeze</button>
+        <button id="swap">Kamera wechseln</button>
+        <button id="fs">Vollbild</button>
 
-    <label>Delay:
-      <input id="delay" type="range" min="1" max="30" value="10" />
-      <b><span id="dLabel">10</span>s</b>
-    </label>
+        <label>
+          Delay
+          <input id="delay" type="range" min="1" max="30" value="10" />
+          <span class="pill"><span id="dLabel">10</span>s</span>
+        </label>
+
+        <label>
+          Qualität
+          <input id="quality" type="range" min="0" max="2" value="1" />
+          <span class="pill" id="qLabel">High</span>
+        </label>
+
+        <span class="status" id="status">Bereit.</span>
+      </div>
+      <div class="muted" style="margin-top:8px">
+        Qualität: <span class="kbd">Medium</span> ist meist flüssiger. <span class="kbd">Ultra</span> kann ruckeln.
+      </div>
+    </div>
+
+    <div class="stage" id="stage">
+      <canvas id="out"></canvas>
+
+      <div class="miniLive" id="miniLive">
+        <video id="live" playsinline autoplay muted></video>
+      </div>
+
+      <div class="overlay">
+        <span class="pill" id="infoPill">Delay aktiv</span>
+        <span class="pill" id="fpsPill">FPS: –</span>
+      </div>
+    </div>
   </div>
 
-  <p class="small">Tipp: Handy quer auf Stativ. „Freeze“ hält das delayed Bild an.</p>
-
-  <p>Live (zum Vergleich):</p>
-  <video id="live" playsinline autoplay muted></video>
-
-  <p>Delayed Output:</p>
-  <canvas id="out"></canvas>
-
 <script>
-const live = document.getElementById('live');
-const out = document.getElementById('out');
-const ctx = out.getContext('2d');
+  const live = document.getElementById('live');
+  const out = document.getElementById('out');
+  const ctx = out.getContext('2d', { alpha:false });
 
-const delaySlider = document.getElementById('delay');
-const dLabel = document.getElementById('dLabel');
-dLabel.textContent = delaySlider.value;
+  const stage = document.getElementById('stage');
+  const btnStart = document.getElementById('start');
+  const btnFreeze = document.getElementById('freeze');
+  const btnSwap = document.getElementById('swap');
+  const btnFs = document.getElementById('fs');
 
-let running = false;
-let frozen = false;
+  const delaySlider = document.getElementById('delay');
+  const dLabel = document.getElementById('dLabel');
 
-let frames = [];     // Array of ImageBitmap (effizienter als ImageData)
-let times = [];      // Zeitstempel in ms
+  const qSlider = document.getElementById('quality');
+  const qLabel = document.getElementById('qLabel');
 
-const targetFps = 15;
-const frameInterval = 1000 / targetFps;
+  const statusEl = document.getElementById('status');
+  const infoPill = document.getElementById('infoPill');
+  const fpsPill = document.getElementById('fpsPill');
 
-delaySlider.oninput = () => dLabel.textContent = delaySlider.value;
+  let stream = null;
+  let running = false;
+  let frozen = false;
 
-document.getElementById('pause').onclick = () => {
-  frozen = !frozen;
-  document.getElementById('pause').textContent = frozen ? "Unfreeze" : "Freeze";
-};
+  // 0=Medium, 1=High, 2=Ultra
+  const qualityPresets = [
+    { name: "Medium", width: 1280, height: 720,  fps: 24 },
+    { name: "High",   width: 1920, height: 1080, fps: 30 },
+    { name: "Ultra",  width: 2560, height: 1440, fps: 30 }
+  ];
 
-document.getElementById('start').onclick = async () => {
-  if (running) return;
-  running = true;
+  let facing = "environment"; // Rückkamera default
+  dLabel.textContent = delaySlider.value;
 
-  const stream = await navigator.mediaDevices.getUserMedia({
-    video: { facingMode: "environment" }, audio: false
-  });
+  function setStatus(t){ statusEl.textContent = t; }
 
-  live.srcObject = stream;
-  await new Promise(r => live.onloadedmetadata = r);
+  function qualityPreset() {
+    const p = qualityPresets[Number(qSlider.value)];
+    qLabel.textContent = p.name;
+    return p;
+  }
+  qualityPreset();
 
-  out.width = live.videoWidth;
-  out.height = live.videoHeight;
+  delaySlider.oninput = () => dLabel.textContent = delaySlider.value;
+  qSlider.oninput = () => qualityPreset();
 
-  // Capture loop
-  let last = performance.now();
+  btnFreeze.onclick = () => {
+    frozen = !frozen;
+    btnFreeze.textContent = frozen ? "Unfreeze" : "Freeze";
+    infoPill.textContent = frozen ? "Freeze aktiv" : "Delay aktiv";
+  };
 
-  async function tick(now) {
-    if (!running) return;
+  btnSwap.onclick = async () => {
+    facing = (facing === "environment") ? "user" : "environment";
+    if (running) {
+      await stopCam();
+      await startCam();
+    }
+  };
 
-    if (now - last >= frameInterval) {
-      last = now;
+  btnFs.onclick = async () => {
+    try{
+      if (!document.fullscreenElement) await stage.requestFullscreen();
+      else await document.exitFullscreen();
+    }catch(e){
+      // iOS Safari kann Fullscreen eingeschränkt haben
+      setStatus("Vollbild wird von deinem Browser evtl. eingeschränkt.");
+    }
+  };
+
+  async function stopCam(){
+    running = false;
+    frozen = false;
+    btnFreeze.textContent = "Freeze";
+    infoPill.textContent = "Delay aktiv";
+    if (stream) {
+      stream.getTracks().forEach(t => t.stop());
+      stream = null;
+    }
+  }
+
+  async function startCam(){
+    const q = qualityPreset();
+
+    setStatus("Kamera wird gestartet…");
+
+    stream = await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: {
+        facingMode: { ideal: facing },
+        width:  { ideal: q.width },
+        height: { ideal: q.height },
+        frameRate: { ideal: q.fps, max: q.fps }
+      }
+    });
+
+    live.srcObject = stream;
+    await new Promise(r => live.onloadedmetadata = r);
+
+    // Canvas echte Auflösung = Video-Auflösung (bessere Qualität)
+    out.width  = live.videoWidth;
+    out.height = live.videoHeight;
+
+    // Schärfer skalieren (wenn Browser es kann)
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+
+    setStatus(`Läuft: ${facing === "environment" ? "Rückkamera" : "Frontkamera"} • ${out.width}x${out.height}`);
+    running = true;
+
+    // Buffer: wir speichern ImageBitmaps + Zeitstempel
+    const frames = [];
+    const times = [];
+
+    // FPS-Tracking
+    let frameCount = 0;
+    let lastFpsTime = performance.now();
+
+    async function tick(){
+      if (!running) return;
+
+      // grob FPS messen
+      frameCount++;
+      const nowPerf = performance.now();
+      if (nowPerf - lastFpsTime >= 1000) {
+        fpsPill.textContent = `FPS: ${frameCount}`;
+        frameCount = 0;
+        lastFpsTime = nowPerf;
+      }
 
       if (!frozen) {
-        // Live frame -> ImageBitmap
         const bmp = await createImageBitmap(live);
         frames.push(bmp);
         times.push(Date.now());
 
-        // Buffer begrenzen (Delay + ein bisschen extra)
         const delaySec = Number(delaySlider.value);
-        const maxFrames = Math.ceil((delaySec + 2) * targetFps);
+        const maxFrames = Math.ceil((delaySec + 2) * q.fps);
 
         while (frames.length > maxFrames) {
-          frames.shift().close?.();
+          const old = frames.shift();
+          old?.close?.();
           times.shift();
         }
 
-        // Delayed frame finden
         const targetTime = Date.now() - delaySec * 1000;
         let idx = times.findIndex(t => t >= targetTime);
         if (idx === -1) idx = 0;
 
         ctx.drawImage(frames[idx], 0, 0, out.width, out.height);
       }
+
+      requestAnimationFrame(tick);
     }
 
     requestAnimationFrame(tick);
   }
 
-  requestAnimationFrame(tick);
-};
+  btnStart.onclick = async () => {
+    try{
+      if (running) return;
+      await startCam();
+    }catch(e){
+      setStatus("Kamera-Start fehlgeschlagen. Erlaube Kamera & nutze am besten Chrome/Safari.");
+    }
+  };
+
+  // Sicherheit: wenn Tab gewechselt wird, nicht weiterlaufen
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) fpsPill.textContent = "FPS: –";
+  });
 </script>
 </body>
 </html>
+
