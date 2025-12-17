@@ -11,21 +11,18 @@
       --radius:16px;
     }
     *{box-sizing:border-box}
-    body{
-      margin:0; padding:12px;
-      background:var(--bg); color:var(--text);
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-    }
+    body{margin:0;padding:12px;background:var(--bg);color:var(--text);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
     .wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
     .bar{
-      background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
-      padding:12px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;
+      background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
+      padding:12px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
     }
     .left,.right{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
     button{
-      appearance:none; border:1px solid var(--border); background:var(--btn); color:var(--text);
-      border-radius:14px; padding:14px 16px; min-height:48px; min-width:120px;
-      font-size:clamp(14px,2.2vw,18px); line-height:1; touch-action:manipulation;
+      appearance:none;border:1px solid var(--border);background:var(--btn);color:var(--text);
+      border-radius:14px;padding:14px 16px;min-height:48px;min-width:120px;
+      font-size:clamp(14px,2.2vw,18px);line-height:1;touch-action:manipulation;
     }
     button.on{background:var(--btnOn)}
     button.icon{min-width:56px;padding:14px 0;text-align:center}
@@ -33,47 +30,44 @@
     button:disabled{opacity:.55}
 
     .pill{
-      border:1px solid var(--border); border-radius:999px; padding:10px 12px; min-height:48px;
-      display:flex; align-items:center; color:var(--muted); font-size:clamp(12px,2vw,15px);
+      border:1px solid var(--border);border-radius:999px;padding:10px 12px;min-height:48px;
+      display:flex;align-items:center;color:var(--muted);font-size:clamp(12px,2vw,15px);
     }
 
     .stage{
-      background:#000; border:1px solid var(--border); border-radius:var(--radius);
-      overflow:hidden; position:relative;
+      background:#000;border:1px solid var(--border);border-radius:var(--radius);
+      overflow:hidden;position:relative;
     }
-    #out{width:100%;height:auto;display:block;background:#000}
+    canvas{width:100%;height:auto;display:block;background:#000}
     video{display:none}
 
-    /* Modal */
     .modalBack{
-      position:fixed; inset:0; background:rgba(0,0,0,.55);
-      display:none; align-items:flex-end; justify-content:center; padding:12px;
+      position:fixed;inset:0;background:rgba(0,0,0,.55);
+      display:none;align-items:flex-end;justify-content:center;padding:12px;
     }
     .modalBack.show{display:flex}
     .modal{
-      width:min(820px,100%); background:var(--panel); border:1px solid var(--border);
-      border-radius:18px; overflow:hidden;
+      width:min(860px,100%);background:var(--panel);border:1px solid var(--border);
+      border-radius:18px;overflow:hidden;
     }
     .modalHeader{
-      display:flex; align-items:center; justify-content:space-between;
-      padding:12px; border-bottom:1px solid var(--border);
+      display:flex;align-items:center;justify-content:space-between;
+      padding:12px;border-bottom:1px solid var(--border);
     }
-    .modalTitle{color:var(--text); font-size:16px; opacity:.95}
-    .modalBody{padding:12px; display:flex; flex-direction:column; gap:12px}
-    .row{display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:space-between}
-    label{color:var(--muted); font-size:14px}
+    .modalTitle{color:var(--text);font-size:16px;opacity:.95}
+    .modalBody{padding:12px;display:flex;flex-direction:column;gap:12px}
+    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+    label{color:var(--muted);font-size:14px}
     input[type="range"]{width:min(520px,78vw)}
     select{
-      background:var(--btn); color:var(--text); border:1px solid var(--border);
-      border-radius:12px; padding:12px; min-height:44px; font-size:14px;
+      background:var(--btn);color:var(--text);border:1px solid var(--border);
+      border-radius:12px;padding:12px;min-height:44px;font-size:14px;
     }
     .smallBtn{min-width:160px}
-    .hint{color:var(--muted); font-size:13px; line-height:1.35}
+    .hint{color:var(--muted);font-size:13px;line-height:1.35}
 
-    /* Heatmap canvas fits on screen */
     .heatWrap{
-      background:#0a0e13; border:1px solid var(--border); border-radius:14px; overflow:hidden;
-      width:100%;
+      background:#0a0e13;border:1px solid var(--border);border-radius:14px;overflow:hidden;width:100%;
     }
     #heatView{
       width:100%;
@@ -84,10 +78,9 @@
     }
 
     .overlayTip{
-      position:absolute; left:10px; right:10px; bottom:10px;
-      background:rgba(15,20,26,.88); border:1px solid rgba(31,42,55,.95);
-      padding:10px 12px; border-radius:14px;
-      color:var(--text); font-size:14px;
+      position:absolute;left:10px;right:10px;bottom:10px;
+      background:rgba(15,20,26,.88);border:1px solid rgba(31,42,55,.95);
+      padding:10px 12px;border-radius:14px;color:var(--text);font-size:14px;
       display:none;
     }
     .overlayTip.show{display:block}
@@ -95,7 +88,6 @@
 </head>
 <body>
 <div class="wrap">
-
   <div class="bar">
     <div class="left">
       <button id="start" class="on">Start</button>
@@ -113,7 +105,6 @@
     <video id="live" playsinline autoplay muted></video>
     <div id="tapTip" class="overlayTip"></div>
   </div>
-
 </div>
 
 <!-- Menü -->
@@ -148,9 +139,18 @@
         <button id="calib" class="smallBtn">Kalibrieren</button>
       </div>
 
+      <div class="row">
+        <button id="autoZoomBtn" class="smallBtn">Auto-Zoom: Aus</button>
+        <button id="setTargetBtn" class="smallBtn">Ziel wählen</button>
+      </div>
+
+      <div class="row">
+        <label for="zoom">Zoom</label>
+        <input id="zoom" type="range" min="10" max="30" value="14" />
+      </div>
+
       <div class="hint">
-        Kalibrieren: Tippe im Video 4 Bahnecken an:
-        <b>nah links</b> → <b>nah rechts</b> → <b>fern rechts</b> → <b>fern links</b>.
+        Auto-Zoom: Tippe einmal auf dich im Bild (Ziel). Dann bleibt der Ausschnitt groß.
       </div>
 
     </div>
@@ -179,7 +179,7 @@
 </div>
 
 <script>
-  // Elements
+  // ---------- Elements ----------
   const live = document.getElementById('live');
   const out  = document.getElementById('out');
   const ctx  = out.getContext('2d', { alpha:false });
@@ -202,6 +202,10 @@
   const btnViewHeat = document.getElementById('viewHeat');
   const btnCalib = document.getElementById('calib');
 
+  const btnAutoZoom = document.getElementById('autoZoomBtn');
+  const btnSetTarget = document.getElementById('setTargetBtn');
+  const zoomSlider = document.getElementById('zoom');
+
   const heatBack = document.getElementById('heatBack');
   const heatClose = document.getElementById('heatClose');
   const heatView = document.getElementById('heatView');
@@ -213,86 +217,123 @@
 
   const tapTip = document.getElementById('tapTip');
 
-  // Feedback
+  // ---------- Helpers ----------
+  function setStatus(t){ statusEl.textContent = t; }
+  function clamp(v,a,b){ return Math.max(a, Math.min(b,v)); }
   function haptic(ms=18){ try{ if (navigator.vibrate) navigator.vibrate(ms); }catch(e){} }
-  let audioCtx=null;
-  function beep(freq=880, durMs=40){
-    try{
-      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const o = audioCtx.createOscillator();
-      const g = audioCtx.createGain();
-      o.type="sine"; o.frequency.value=freq;
-      g.gain.value=0.03;
-      o.connect(g); g.connect(audioCtx.destination);
-      o.start();
-      setTimeout(()=>{ o.stop(); o.disconnect(); g.disconnect(); }, durMs);
-    }catch(e){}
-  }
 
-  // State
-  let stream = null;
-  let running = false;
-  let frozen = false;
-  let facing = "environment";
-  let captureTimer = null;
-  let frames = []; // delay buffer
+  // ---------- State ----------
+  let stream=null, running=false, frozen=false, facing="environment";
+  let captureTimer=null;
 
-  const presets = [
-    { name:"Medium", w:1280, h:720,  fps:24 },
-    { name:"Hoch",   w:1920, h:1080, fps:30 },
-    { name:"Ultra",  w:2560, h:1440, fps:30 }
+  // Frame buffer stored as ImageData (works everywhere)
+  let frames=[]; // { t:number, img:ImageData }
+  let captureCanvas=document.createElement('canvas');
+  let captureCtx=captureCanvas.getContext('2d', { willReadFrequently:true });
+
+  const presets=[
+    {name:"Medium", w:1280, h:720,  fps:24 },
+    {name:"Hoch",   w:1920, h:1080, fps:30 },
+    {name:"Ultra",  w:2560, h:1440, fps:30 }
   ];
   function preset(){ return presets[Number(qualitySelect.value)]; }
 
-  function setStatus(t){ statusEl.textContent = t; }
-  function clamp(v,a,b){ return Math.max(a, Math.min(b,v)); }
-
-  function clearFrames(){
-    for (const f of frames) f.bmp?.close?.();
-    frames.length = 0;
-  }
+  function clearFrames(){ frames.length=0; }
 
   function pickFrameAtOrBefore(targetTime){
-    if (!frames.length) return null;
-    let lo=0, hi=frames.length-1, best=-1;
-    while (lo<=hi){
+    if(!frames.length) return null;
+    let lo=0, hi=frames.length-1, best=0;
+    while(lo<=hi){
       const mid=(lo+hi)>>1;
-      if (frames[mid].t <= targetTime){ best=mid; lo=mid+1; }
+      if(frames[mid].t<=targetTime){ best=mid; lo=mid+1; }
       else hi=mid-1;
     }
-    return best>=0 ? frames[best] : frames[0];
+    return frames[best];
   }
 
-  // Tracking
+  // ---------- Auto Zoom (digital crop) ----------
+  let autoZoomOn=false;
+  let zoomFactor=1.4;
+  let target=null;      // {x,y} in out coords
+  let targetPick=false;
+
+  function updateAutoZoomUI(){
+    btnAutoZoom.textContent = autoZoomOn ? "Auto-Zoom: An" : "Auto-Zoom: Aus";
+    btnAutoZoom.classList.toggle("on", autoZoomOn);
+  }
+
+  zoomFactor = Number(zoomSlider.value)/10;
+  zoomSlider.oninput = ()=>{ zoomFactor = Number(zoomSlider.value)/10; };
+
+  btnAutoZoom.onclick=()=>{
+    haptic();
+    autoZoomOn=!autoZoomOn;
+    updateAutoZoomUI();
+    if(autoZoomOn && !target){
+      targetPick=true;
+      setStatus("Tippe auf dich im Bild");
+    }
+  };
+  btnSetTarget.onclick=()=>{
+    haptic();
+    targetPick=true;
+    setStatus("Tippe auf dich im Bild");
+  };
+  updateAutoZoomUI();
+
+  function drawZoomedImageData(img){
+    // draw ImageData to a temp canvas, then draw to output with crop
+    captureCanvas.width = img.width;
+    captureCanvas.height = img.height;
+    captureCtx.putImageData(img, 0, 0);
+
+    if(!autoZoomOn || !target){
+      ctx.drawImage(captureCanvas, 0,0, out.width, out.height);
+      return;
+    }
+
+    const z = zoomFactor;
+    const cropW = out.width / z;
+    const cropH = out.height / z;
+
+    let sx = target.x - cropW/2;
+    let sy = target.y - cropH/2;
+
+    sx = Math.max(0, Math.min(out.width  - cropW, sx));
+    sy = Math.max(0, Math.min(out.height - cropH, sy));
+
+    ctx.drawImage(captureCanvas, sx, sy, cropW, cropH, 0, 0, out.width, out.height);
+  }
+
+  // ---------- Tracking (simple motion centroid) ----------
   const aW=200, aH=112;
   const aCan=document.createElement('canvas');
   aCan.width=aW; aCan.height=aH;
   const aCtx=aCan.getContext('2d',{willReadFrequently:true});
   let prevGray=null;
 
-  let currentPath = [];
-  let holdPathUntil = 0;
-  let missCount = 0;
-  const MISS_END_FRAMES = 10;
+  let currentPath=[], holdPathUntil=0, missCount=0;
+  const MISS_END_FRAMES=10;
 
-  let throwStore = [];
-  let keepLastN = 10;
+  let throwStore=[], keepLastN=10;
 
-  function resetTracking(){
-    prevGray=null;
-    missCount=0;
-    currentPath=[];
-    holdPathUntil=0;
-  }
+  function resetTracking(){ prevGray=null; missCount=0; currentPath=[]; holdPathUntil=0; }
 
-  function detectBallPointFromBitmap(bmp){
-    aCtx.drawImage(bmp,0,0,aW,aH);
-    const img=aCtx.getImageData(0,0,aW,aH);
-    const data=img.data;
+  function detectBallPointFromImageData(img){
+    // Downscale for speed
+    // draw img into aCan
+    // Use temp canvas (captureCanvas already matches img size sometimes, but we use aCan)
+    // Convert by drawImage via captureCanvas to avoid getImageData huge on mobile.
+    captureCanvas.width = img.width;
+    captureCanvas.height = img.height;
+    captureCtx.putImageData(img,0,0);
+
+    aCtx.drawImage(captureCanvas, 0,0, aW,aH);
+    const data = aCtx.getImageData(0,0,aW,aH).data;
 
     const gray=new Uint8Array(aW*aH);
     for(let i=0,j=0;i<data.length;i+=4,j++){
-      gray[j]=(data[i]*3 + data[i+1]*4 + data[i+2]) >> 3;
+      gray[j]=(data[i]*3 + data[i+1]*4 + data[i+2])>>3;
     }
     if(!prevGray){ prevGray=gray; return null; }
 
@@ -305,9 +346,7 @@
         const d=Math.abs(gray[idx]-prevGray[idx]);
         if(d>TH){
           const w=d;
-          sumW+=w;
-          sumX+=w*x;
-          sumY+=w*y;
+          sumW+=w; sumX+=w*x; sumY+=w*y;
         }
       }
     }
@@ -319,36 +358,35 @@
   }
 
   function finalizeThrow(){
-    if (currentPath.length >= 6){
-      throwStore.push({ points: currentPath.map(p => ({x:p.x,y:p.y})), ts: Date.now() });
-      if (throwStore.length > keepLastN) throwStore = throwStore.slice(-keepLastN);
+    if(currentPath.length>=6){
+      throwStore.push({ points: currentPath.map(p=>({x:p.x,y:p.y})), ts:Date.now() });
+      if(throwStore.length>keepLastN) throwStore=throwStore.slice(-keepLastN);
     }
   }
 
-  function processTrackingOnFrame(bmp){
+  function processTrackingOnFrame(img){
     const now=Date.now();
-    if (holdPathUntil && now < holdPathUntil) return;
+    if(holdPathUntil && now<holdPathUntil) return;
 
-    const pt = detectBallPointFromBitmap(bmp);
+    const pt = detectBallPointFromImageData(img);
     if(!pt){
       missCount++;
       if(currentPath.length>10 && missCount>=MISS_END_FRAMES){
         finalizeThrow();
-        holdPathUntil = now + 3000;
-        missCount = 0;
+        holdPathUntil=now+3000;
+        missCount=0;
       }
       return;
     }
 
     missCount=0;
-    if(holdPathUntil && now >= holdPathUntil){
-      currentPath=[];
-      holdPathUntil=0;
+    if(holdPathUntil && now>=holdPathUntil){
+      currentPath=[]; holdPathUntil=0;
     }
 
     const last=currentPath[currentPath.length-1];
     const minDist=Math.max(2, Math.min(out.width,out.height)*0.004);
-    if(!last || Math.hypot(pt.x-last.x, pt.y-last.y) > minDist){
+    if(!last || Math.hypot(pt.x-last.x, pt.y-last.y)>minDist){
       currentPath.push({x:pt.x,y:pt.y});
     }
     if(currentPath.length>900) currentPath.shift();
@@ -356,21 +394,20 @@
 
   function drawHoldOverlay(){
     const now=Date.now();
-    const holding = holdPathUntil && now < holdPathUntil;
-    if (!holding || currentPath.length < 2) return;
+    const holding = holdPathUntil && now<holdPathUntil;
+    if(!holding || currentPath.length<2) return;
 
     ctx.save();
-    ctx.lineJoin="round";
-    ctx.lineCap="round";
+    ctx.lineJoin="round"; ctx.lineCap="round";
 
-    ctx.lineWidth = Math.max(3, Math.min(out.width,out.height)*0.006);
+    ctx.lineWidth=Math.max(3, Math.min(out.width,out.height)*0.006);
     ctx.strokeStyle="rgba(0,0,0,0.55)";
     ctx.beginPath();
     ctx.moveTo(currentPath[0].x,currentPath[0].y);
     for(let i=1;i<currentPath.length;i++) ctx.lineTo(currentPath[i].x,currentPath[i].y);
     ctx.stroke();
 
-    ctx.lineWidth = Math.max(2, Math.min(out.width,out.height)*0.004);
+    ctx.lineWidth=Math.max(2, Math.min(out.width,out.height)*0.004);
     ctx.strokeStyle="rgba(255,255,255,0.92)";
     ctx.beginPath();
     ctx.moveTo(currentPath[0].x,currentPath[0].y);
@@ -380,471 +417,417 @@
     ctx.restore();
   }
 
-  // Calibration (optional)
-  let calibActive = false;
-  let calibPts = [];
-  let H = null;
-
-  function showTip(t){ tapTip.textContent = t; tapTip.classList.add('show'); }
+  // ---------- Calibration ----------
+  let calibActive=false, calibPts=[], H=null;
+  function showTip(t){ tapTip.textContent=t; tapTip.classList.add('show'); }
   function hideTip(){ tapTip.classList.remove('show'); }
 
   function computeHomography(src4, dst4){
-    const A = [];
-    const b = [];
-    for (let i=0;i<4;i++){
-      const x = src4[i].x, y = src4[i].y;
-      const u = dst4[i].x, v = dst4[i].y;
+    const A=[], b=[];
+    for(let i=0;i<4;i++){
+      const x=src4[i].x, y=src4[i].y;
+      const u=dst4[i].x, v=dst4[i].y;
       A.push([x,y,1, 0,0,0, -u*x, -u*y]); b.push(u);
       A.push([0,0,0, x,y,1, -v*x, -v*y]); b.push(v);
     }
     const n=8;
-    const M = A.map((row,i)=>row.concat([b[i]]));
+    const M=A.map((row,i)=>row.concat([b[i]]));
     for(let col=0; col<n; col++){
       let pivot=col;
       for(let r=col+1;r<n;r++){
-        if (Math.abs(M[r][col]) > Math.abs(M[pivot][col])) pivot=r;
+        if(Math.abs(M[r][col])>Math.abs(M[pivot][col])) pivot=r;
       }
-      const tmp=M[col]; M[col]=M[pivot]; M[pivot]=tmp;
-      const div = M[col][col] || 1e-12;
-      for(let c=col;c<=n;c++) M[col][c] /= div;
+      [M[col],M[pivot]]=[M[pivot],M[col]];
+      const div=M[col][col]||1e-12;
+      for(let c=col;c<=n;c++) M[col][c]/=div;
       for(let r=0;r<n;r++){
         if(r===col) continue;
-        const factor = M[r][col];
-        for(let c=col;c<=n;c++) M[r][c] -= factor * M[col][c];
+        const factor=M[r][col];
+        for(let c=col;c<=n;c++) M[r][c]-=factor*M[col][c];
       }
     }
-    const h = M.map(row=>row[n]);
-    return [
-      [h[0], h[1], h[2]],
-      [h[3], h[4], h[5]],
-      [h[6], h[7], 1]
-    ];
+    const h=M.map(row=>row[n]);
+    return [[h[0],h[1],h[2]],[h[3],h[4],h[5]],[h[6],h[7],1]];
   }
-
   function applyH(H, x, y){
-    const a = H[0][0]*x + H[0][1]*y + H[0][2];
-    const b = H[1][0]*x + H[1][1]*y + H[1][2];
-    const c = H[2][0]*x + H[2][1]*y + H[2][2];
-    return { x: a/c, y: b/c };
+    const a=H[0][0]*x + H[0][1]*y + H[0][2];
+    const b=H[1][0]*x + H[1][1]*y + H[1][2];
+    const c=H[2][0]*x + H[2][1]*y + H[2][2];
+    return { x:a/c, y:b/c };
   }
-
   function startCalib(){
-    calibActive = true;
-    calibPts = [];
-    H = null;
+    calibActive=true; calibPts=[]; H=null;
     showTip("Kalibrieren: Tippe nah links.");
     closeMenu();
   }
 
-  // Heatmap sizing
+  // ---------- Heatmap ----------
+  let heatAnimId=null;
+
   function resizeHeatCanvas(){
     const cssW = heatView.clientWidth || 600;
     const cssH = heatView.clientHeight || 600;
     const dpr = Math.min(2, window.devicePixelRatio || 1);
-    const w = Math.max(300, Math.round(cssW * dpr));
-    const h = Math.max(300, Math.round(cssH * dpr));
-    if (heatView.width !== w || heatView.height !== h){
-      heatView.width = w;
-      heatView.height = h;
-    }
+    const w = Math.max(320, Math.round(cssW * dpr));
+    const h = Math.max(320, Math.round(cssH * dpr));
+    if(heatView.width!==w || heatView.height!==h){ heatView.width=w; heatView.height=h; }
   }
 
-  // Proper lane proportions
   function laneMetrics(){
-    // Realistic ratio: length / width ≈ 17.35
-    const R = 17.35;
-
-    const topPad = Math.round(heatView.height * 0.06);
-    const bottomPad = Math.round(heatView.height * 0.04);
-    const laneH = Math.max(200, heatView.height - topPad - bottomPad);
-
-    const maxW = Math.round(heatView.width * 0.82);
-    const laneW = Math.max(180, Math.min(maxW, Math.round(laneH / R)));
-
-    const laneX = Math.round((heatView.width - laneW) / 2);
-    const laneY = topPad;
-
-    return { laneX, laneY, laneW, laneH };
+    // realistic: length/width ~ 17.35
+    const R=17.35;
+    const topPad=Math.round(heatView.height*0.06);
+    const bottomPad=Math.round(heatView.height*0.04);
+    const laneH=Math.max(220, heatView.height - topPad - bottomPad);
+    const maxW=Math.round(heatView.width*0.82);
+    const laneW=Math.max(180, Math.min(maxW, Math.round(laneH / R)));
+    const laneX=Math.round((heatView.width - laneW) / 2);
+    const laneY=topPad;
+    return {laneX,laneY,laneW,laneH};
   }
-
-  // Heatmap drawing (animated)
-  let heatAnimId = null;
 
   function drawLaneBackground(){
-    heatCtx.fillStyle = "#0a0e13";
+    heatCtx.fillStyle="#0a0e13";
     heatCtx.fillRect(0,0,heatView.width,heatView.height);
 
-    const lane = laneMetrics();
+    const lane=laneMetrics();
 
-    // gutters + lane
-    const gutterW = lane.laneW * 0.18;
-    heatCtx.fillStyle = "#0b1118";
+    // gutters
+    const gutterW=Math.max(10, Math.round(lane.laneW*0.16));
+    heatCtx.fillStyle="#070a0f";
     heatCtx.fillRect(lane.laneX - gutterW, lane.laneY, gutterW, lane.laneH);
     heatCtx.fillRect(lane.laneX + lane.laneW, lane.laneY, gutterW, lane.laneH);
 
-    heatCtx.fillStyle = "#0e141c";
+    // lane
+    heatCtx.fillStyle="#0e141c";
     heatCtx.fillRect(lane.laneX, lane.laneY, lane.laneW, lane.laneH);
 
-    heatCtx.strokeStyle = "#223041";
-    heatCtx.lineWidth = Math.max(2, Math.round(heatView.width * 0.004));
+    heatCtx.strokeStyle="#223041";
+    heatCtx.lineWidth=Math.max(2, Math.round(heatView.width*0.004));
     heatCtx.strokeRect(lane.laneX, lane.laneY, lane.laneW, lane.laneH);
 
-    // boards (subtle)
-    heatCtx.strokeStyle = "rgba(255,255,255,0.06)";
-    heatCtx.lineWidth = 1;
-    const boards = 39;
+    // boards
+    heatCtx.strokeStyle="rgba(255,255,255,0.06)";
+    heatCtx.lineWidth=1;
+    const boards=39;
     for(let i=1;i<boards;i++){
-      const x = lane.laneX + (i/boards)*lane.laneW;
+      const x=lane.laneX + (i/boards)*lane.laneW;
       heatCtx.beginPath();
-      heatCtx.moveTo(x, lane.laneY);
-      heatCtx.lineTo(x, lane.laneY + lane.laneH);
+      heatCtx.moveTo(x,lane.laneY);
+      heatCtx.lineTo(x,lane.laneY+lane.laneH);
       heatCtx.stroke();
     }
 
-    // foul line (near bottom)
-    const foulY = lane.laneY + lane.laneH * 0.86;
-    heatCtx.strokeStyle = "rgba(255,255,255,0.20)";
-    heatCtx.lineWidth = Math.max(2, Math.round(heatView.width * 0.006));
+    // foul line
+    const foulY=lane.laneY + lane.laneH*0.86;
+    heatCtx.strokeStyle="rgba(255,255,255,0.20)";
+    heatCtx.lineWidth=Math.max(2, Math.round(heatView.width*0.006));
     heatCtx.beginPath();
-    heatCtx.moveTo(lane.laneX, foulY);
-    heatCtx.lineTo(lane.laneX + lane.laneW, foulY);
+    heatCtx.moveTo(lane.laneX,foulY);
+    heatCtx.lineTo(lane.laneX+lane.laneW,foulY);
     heatCtx.stroke();
 
-    // rangefinder dots
-    const dotsY1 = lane.laneY + lane.laneH * 0.78;
-    const dotsY2 = lane.laneY + lane.laneH * 0.72;
-    const dotBoards = [7, 13, 19, 25, 31];
-    heatCtx.fillStyle = "rgba(255,255,255,0.18)";
-    const dotR = Math.max(2, Math.round(heatView.width * 0.0055));
-    for (const b of dotBoards){
-      const x = lane.laneX + (b/39) * lane.laneW;
-      heatCtx.beginPath(); heatCtx.arc(x, dotsY1, dotR, 0, Math.PI*2); heatCtx.fill();
-      heatCtx.beginPath(); heatCtx.arc(x, dotsY2, dotR, 0, Math.PI*2); heatCtx.fill();
+    // dots
+    const dotsY1=lane.laneY + lane.laneH*0.78;
+    const dotsY2=lane.laneY + lane.laneH*0.72;
+    const dotBoards=[7,13,19,25,31];
+    heatCtx.fillStyle="rgba(255,255,255,0.18)";
+    const dotR=Math.max(2, Math.round(heatView.width*0.006));
+    for(const b of dotBoards){
+      const x=lane.laneX + (b/39)*lane.laneW;
+      heatCtx.beginPath(); heatCtx.arc(x,dotsY1,dotR,0,Math.PI*2); heatCtx.fill();
+      heatCtx.beginPath(); heatCtx.arc(x,dotsY2,dotR,0,Math.PI*2); heatCtx.fill();
     }
 
     // arrows
-    const arrowsY = lane.laneY + lane.laneH * 0.64;
-    const arrowBoards = [5, 10, 15, 20, 25, 30, 35];
-    const aw = lane.laneW * 0.04;
-    const ah = lane.laneW * 0.04;
-    heatCtx.fillStyle = "rgba(255,255,255,0.16)";
-    for (const b of arrowBoards){
-      const cx = lane.laneX + (b/39) * lane.laneW;
+    const arrowsY=lane.laneY + lane.laneH*0.64;
+    const arrowBoards=[5,10,15,20,25,30,35];
+    const aw=lane.laneW*0.05, ah=lane.laneH*0.02;
+    heatCtx.fillStyle="rgba(255,255,255,0.16)";
+    for(const b of arrowBoards){
+      const cx=lane.laneX + (b/39)*lane.laneW;
       heatCtx.beginPath();
-      heatCtx.moveTo(cx, arrowsY - ah);
-      heatCtx.lineTo(cx - aw, arrowsY + ah);
-      heatCtx.lineTo(cx + aw, arrowsY + ah);
+      heatCtx.moveTo(cx,arrowsY-ah);
+      heatCtx.lineTo(cx-aw/2,arrowsY+ah);
+      heatCtx.lineTo(cx+aw/2,arrowsY+ah);
       heatCtx.closePath();
       heatCtx.fill();
     }
 
-    // pin deck marker
-    const pinDeckY = lane.laneY + lane.laneH * 0.10;
-    heatCtx.strokeStyle = "rgba(255,255,255,0.12)";
-    heatCtx.lineWidth = Math.max(1, Math.round(heatView.width * 0.004));
+    // pin deck line
+    const pinDeckY=lane.laneY + lane.laneH*0.10;
+    heatCtx.strokeStyle="rgba(255,255,255,0.12)";
+    heatCtx.lineWidth=Math.max(1, Math.round(heatView.width*0.004));
     heatCtx.beginPath();
-    heatCtx.moveTo(lane.laneX, pinDeckY);
-    heatCtx.lineTo(lane.laneX + lane.laneW, pinDeckY);
+    heatCtx.moveTo(lane.laneX,pinDeckY);
+    heatCtx.lineTo(lane.laneX+lane.laneW,pinDeckY);
     heatCtx.stroke();
 
-    // pins – correct orientation (headpin lower in the cluster)
-    const pinCenterX = lane.laneX + lane.laneW * 0.50;
-    const pinDeckTop    = lane.laneY + lane.laneH * 0.04;
-    const pinDeckBottom = lane.laneY + lane.laneH * 0.12;
-
-    const pinDy = (pinDeckBottom - pinDeckTop) / 3;
-    const pinDx = lane.laneW * 0.10;
-    const pinR  = Math.max(2, Math.round(heatView.width * 0.0065));
-
-    heatCtx.fillStyle = "rgba(255,255,255,0.22)";
-    const rows = [
-      [-1.5, -0.5, 0.5, 1.5],
-      [-1, 0, 1],
-      [-0.5, 0.5],
-      [0]
-    ];
-    for (let r=0; r<rows.length; r++){
-      const y = pinDeckTop + r * pinDy;
-      for (const off of rows[r]){
-        const x = pinCenterX + off * pinDx;
-        heatCtx.beginPath();
-        heatCtx.arc(x, y, pinR, 0, Math.PI*2);
-        heatCtx.fill();
+    // pins correct orientation (headpin lower in cluster)
+    const pinCenterX=lane.laneX + lane.laneW*0.50;
+    const pinDeckTop=lane.laneY + lane.laneH*0.04;
+    const pinDeckBottom=lane.laneY + lane.laneH*0.12;
+    const pinDy=(pinDeckBottom - pinDeckTop)/3;
+    const pinDx=lane.laneW*0.08;
+    const pinR=Math.max(2, Math.round(heatView.width*0.007));
+    heatCtx.fillStyle="rgba(255,255,255,0.20)";
+    const rows=[[-1.5,-0.5,0.5,1.5],[-1,0,1],[-0.5,0.5],[0]];
+    for(let r=0;r<rows.length;r++){
+      const y=pinDeckTop + r*pinDy;
+      for(const off of rows[r]){
+        const x=pinCenterX + off*pinDx;
+        heatCtx.beginPath(); heatCtx.arc(x,y,pinR,0,Math.PI*2); heatCtx.fill();
       }
     }
 
-    // label
-    heatCtx.fillStyle = "rgba(154,164,178,0.92)";
-    heatCtx.font = `${Math.max(12, Math.round(heatView.width*0.03))}px system-ui, -apple-system, Segoe UI, Roboto, sans-serif`;
-    heatCtx.fillText(H ? "Kalibriert" : "Nicht kalibriert", Math.round(heatView.width*0.07), Math.round(heatView.height*0.08));
-
+    heatCtx.fillStyle="rgba(154,164,178,0.92)";
+    heatCtx.font = `${Math.max(12, Math.round(heatView.width*0.05))}px system-ui, -apple-system, Segoe UI, Roboto, sans-serif`;
+    heatCtx.fillText(H ? "Kalibriert" : "Nicht kalibriert", lane.laneX, lane.laneY - Math.max(10, Math.round(heatView.height*0.02)));
     return lane;
   }
 
   function drawOneThrowTopDown(throwObj, progress01, index, total, lane){
-    const pts = throwObj.points;
-    if (!pts || pts.length < 2) return;
-
-    const age = (total - 1 - index);
-    const alpha = Math.max(0.18, 0.62 - age * 0.06);
+    const pts=throwObj.points;
+    if(!pts || pts.length<2) return;
+    const age=(total-1-index);
+    const alpha=Math.max(0.18, 0.60 - age*0.06);
 
     heatCtx.save();
-    heatCtx.lineJoin = "round";
-    heatCtx.lineCap  = "round";
-    heatCtx.lineWidth = Math.max(2, lane.laneW * 0.08);
-    heatCtx.strokeStyle = `rgba(255,255,255,${alpha})`;
+    heatCtx.lineJoin="round"; heatCtx.lineCap="round";
+    heatCtx.lineWidth=Math.max(2, lane.laneW*0.06);
+    heatCtx.strokeStyle=`rgba(255,255,255,${alpha})`;
 
-    const maxK = Math.max(1, Math.floor((pts.length - 1) * clamp(progress01,0,1)));
-
+    const maxK=Math.max(1, Math.floor((pts.length-1)*clamp(progress01,0,1)));
     heatCtx.beginPath();
-    for (let k=0; k<=maxK; k++){
-      const p = pts[k];
-
-      let uv;
-      if (H) uv = applyH(H, p.x, p.y);
-      else uv = { x: p.x / out.width, y: p.y / out.height };
-
-      const u = clamp(uv.x, 0, 1);
-      const v = clamp(uv.y, 0, 1);
-
-      const x = lane.laneX + u * lane.laneW;
-      const y = lane.laneY + v * lane.laneH;
-
-      if (k === 0) heatCtx.moveTo(x, y);
-      else heatCtx.lineTo(x, y);
+    for(let k=0;k<=maxK;k++){
+      const p=pts[k];
+      let uv = H ? applyH(H, p.x, p.y) : {x:p.x/out.width, y:p.y/out.height};
+      const u=clamp(uv.x,0,1), v=clamp(uv.y,0,1);
+      const x=lane.laneX + u*lane.laneW;
+      const y=lane.laneY + v*lane.laneH;
+      if(k===0) heatCtx.moveTo(x,y); else heatCtx.lineTo(x,y);
     }
     heatCtx.stroke();
     heatCtx.restore();
   }
 
   function startHeatAnimation(){
-    if (heatAnimId) cancelAnimationFrame(heatAnimId);
-    heatAnimId = null;
-
+    if(heatAnimId) cancelAnimationFrame(heatAnimId);
+    heatAnimId=null;
     resizeHeatCanvas();
 
-    const throws = throwStore.slice(-keepLastN);
-    const total = throws.length;
-
-    const msPerThrow = 260;
-    const msPerLine  = 420;
-    const startT = performance.now();
+    const throws=throwStore.slice(-keepLastN);
+    const total=throws.length;
+    const msPerThrow=260, msPerLine=420;
+    const startT=performance.now();
 
     function frame(now){
-      const lane = drawLaneBackground();
-
-      const elapsed = now - startT;
-      const fullCount = Math.min(total, Math.floor(elapsed / msPerThrow));
-
-      for (let i=0; i<fullCount; i++){
-        drawOneThrowTopDown(throws[i], 1, i, total, lane);
-      }
-
-      const idx = fullCount;
-      if (idx < total){
-        const t0 = idx * msPerThrow;
-        const p = (elapsed - t0) / msPerLine;
-        drawOneThrowTopDown(throws[idx], p, idx, total, lane);
-        heatAnimId = requestAnimationFrame(frame);
-      } else {
-        heatAnimId = null;
-      }
+      const lane=drawLaneBackground();
+      const elapsed=now-startT;
+      const fullCount=Math.min(total, Math.floor(elapsed/msPerThrow));
+      for(let i=0;i<fullCount;i++) drawOneThrowTopDown(throws[i],1,i,total,lane);
+      const idx=fullCount;
+      if(idx<total){
+        const p=(elapsed - idx*msPerThrow)/msPerLine;
+        drawOneThrowTopDown(throws[idx],p,idx,total,lane);
+        heatAnimId=requestAnimationFrame(frame);
+      }else heatAnimId=null;
     }
-
-    heatAnimId = requestAnimationFrame(frame);
+    heatAnimId=requestAnimationFrame(frame);
   }
+  heatView.addEventListener('click', ()=>startHeatAnimation());
 
-  heatView.addEventListener('click', () => startHeatAnimation());
-  window.addEventListener('resize', () => { if (heatBack.classList.contains('show')) startHeatAnimation(); });
-
-  // Modals
+  // ---------- UI / Modals ----------
   function openMenu(){ menuBack.classList.add('show'); }
   function closeMenu(){ menuBack.classList.remove('show'); }
-  btnMenu.onclick = () => { haptic(); beep(650,25); openMenu(); };
-  menuClose.onclick = () => { haptic(); beep(520,25); closeMenu(); };
-  menuBack.addEventListener('click', (e) => { if (e.target === menuBack) closeMenu(); });
+  btnMenu.onclick=()=>{ haptic(); openMenu(); };
+  menuClose.onclick=()=>{ haptic(); closeMenu(); };
+  menuBack.addEventListener('click',(e)=>{ if(e.target===menuBack) closeMenu(); });
 
-  function openHeat(){
-    heatBack.classList.add('show');
-    heatNLabel.textContent = String(keepLastN);
-    startHeatAnimation();
-  }
-  function closeHeat(){
-    heatBack.classList.remove('show');
-    if (heatAnimId) cancelAnimationFrame(heatAnimId);
-    heatAnimId = null;
-  }
-  heatClose.onclick = () => { haptic(); beep(520,25); closeHeat(); };
-  heatBack.addEventListener('click', (e) => { if (e.target === heatBack) closeHeat(); });
+  function openHeat(){ heatBack.classList.add('show'); heatNLabel.textContent=String(keepLastN); startHeatAnimation(); }
+  function closeHeat(){ heatBack.classList.remove('show'); if(heatAnimId) cancelAnimationFrame(heatAnimId); heatAnimId=null; }
+  heatClose.onclick=()=>{ haptic(); closeHeat(); };
+  heatBack.addEventListener('click',(e)=>{ if(e.target===heatBack) closeHeat(); });
 
-  btnViewHeat.onclick = () => { haptic(); beep(820,30); closeMenu(); openHeat(); };
-  btnCalib.onclick = () => { haptic(); beep(820,35); startCalib(); };
+  btnViewHeat.onclick=()=>{ haptic(); closeMenu(); openHeat(); };
+  btnCalib.onclick=()=>{ haptic(); startCalib(); };
 
-  // Settings
-  dLabel.textContent = delaySlider.value;
-  delaySlider.oninput = () => { dLabel.textContent = delaySlider.value; };
+  dLabel.textContent=delaySlider.value;
+  delaySlider.oninput=()=>{ dLabel.textContent=delaySlider.value; };
 
-  btnSet10.onclick = () => {
-    keepLastN = 10;
-    btnSet10.classList.add('on');
-    btnSet25.classList.remove('on');
-    if (throwStore.length > keepLastN) throwStore = throwStore.slice(-keepLastN);
-    heatNLabel.textContent = "10";
-    startHeatAnimation();
+  btnSet10.onclick=()=>{
+    keepLastN=10; btnSet10.classList.add('on'); btnSet25.classList.remove('on');
+    if(throwStore.length>keepLastN) throwStore=throwStore.slice(-keepLastN);
+    heatNLabel.textContent="10"; startHeatAnimation();
   };
-  btnSet25.onclick = () => {
-    keepLastN = 25;
-    btnSet25.classList.add('on');
-    btnSet10.classList.remove('on');
-    if (throwStore.length > keepLastN) throwStore = throwStore.slice(-keepLastN);
-    heatNLabel.textContent = "25";
-    startHeatAnimation();
+  btnSet25.onclick=()=>{
+    keepLastN=25; btnSet25.classList.add('on'); btnSet10.classList.remove('on');
+    if(throwStore.length>keepLastN) throwStore=throwStore.slice(-keepLastN);
+    heatNLabel.textContent="25"; startHeatAnimation();
   };
-  btnClearHeat.onclick = () => {
-    haptic(28); beep(420,60);
-    throwStore = [];
-    resetTracking();
-    startHeatAnimation();
+  btnClearHeat.onclick=()=>{ haptic(28); throwStore=[]; resetTracking(); startHeatAnimation(); };
+
+  btnSwitchCam.onclick=async()=>{
+    haptic();
+    facing = (facing==="environment") ? "user" : "environment";
+    if(running){ await stopCam(); await startCam(); }
   };
 
-  // Calibration click (stage)
-  stage.addEventListener('click', (e) => {
-    if (!calibActive) return;
-
-    const rect = out.getBoundingClientRect();
-    const x = (e.clientX - rect.left) * (out.width / rect.width);
-    const y = (e.clientY - rect.top)  * (out.height / rect.height);
-    calibPts.push({x,y});
-
-    if (calibPts.length === 1) showTip("Tippe nah rechts.");
-    else if (calibPts.length === 2) showTip("Tippe fern rechts.");
-    else if (calibPts.length === 3) showTip("Tippe fern links.");
-    else if (calibPts.length === 4){
-      const dst = [{x:0,y:1},{x:1,y:1},{x:1,y:0},{x:0,y:0}];
-      H = computeHomography(calibPts, dst);
-      calibActive = false;
-      hideTip();
-      setStatus("Kalibriert");
-      beep(900,45);
-    }
-  });
-
-  // Controls
-  btnSwitchCam.onclick = async () => {
-    haptic(); beep(740,30);
-    facing = (facing === "environment") ? "user" : "environment";
-    if (running){ await stopCam(); await startCam(); }
-  };
-
-  btnFreeze.onclick = () => {
+  btnFreeze.onclick=()=>{
     haptic(28);
-    frozen = !frozen;
+    frozen=!frozen;
     btnFreeze.classList.toggle('on', frozen);
     btnFreeze.textContent = frozen ? "Weiter" : "Freeze";
-    beep(frozen ? 520 : 880, 45);
     setStatus(frozen ? "Freeze" : (running ? "Läuft" : "Bereit"));
   };
 
-  btnFs.onclick = async () => {
-    haptic(); beep(660,25);
+  btnFs.onclick=async()=>{
+    haptic();
     try{
-      if (!document.fullscreenElement) await stage.requestFullscreen();
+      if(!document.fullscreenElement) await stage.requestFullscreen();
       else await document.exitFullscreen();
-    }catch(e){
-      setStatus("Vollbild nicht verfügbar");
+    }catch(e){ setStatus("Vollbild nicht verfügbar"); }
+  };
+
+  // Tap handling: target pick OR calibration
+  stage.addEventListener('click', (e)=>{
+    const rect=out.getBoundingClientRect();
+    const x=(e.clientX-rect.left)*(out.width/rect.width);
+    const y=(e.clientY-rect.top )*(out.height/rect.height);
+
+    if(targetPick){
+      target={x,y};
+      targetPick=false;
+      setStatus("Ziel gesetzt");
+      return;
     }
-  };
 
-  btnStart.onclick = async () => {
-    if (running) return;
-    haptic(22); beep(660,35);
-    try{ await startCam(); }
-    catch(e){ setStatus("Kamera blockiert"); }
-  };
+    if(!calibActive) return;
+    calibPts.push({x,y});
+    if(calibPts.length===1) showTip("Tippe nah rechts.");
+    else if(calibPts.length===2) showTip("Tippe fern rechts.");
+    else if(calibPts.length===3) showTip("Tippe fern links.");
+    else if(calibPts.length===4){
+      const dst=[{x:0,y:1},{x:1,y:1},{x:1,y:0},{x:0,y:0}];
+      H=computeHomography(calibPts,dst);
+      calibActive=false;
+      hideTip();
+      setStatus("Kalibriert");
+    }
+  });
 
+  // ---------- Camera (FIXED) ----------
   async function stopCam(){
-    running=false;
-    frozen=false;
+    running=false; frozen=false;
     btnFreeze.classList.remove('on');
     btnFreeze.textContent="Freeze";
-    if (captureTimer){ clearInterval(captureTimer); captureTimer=null; }
-    if (stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; }
+    if(captureTimer){ clearInterval(captureTimer); captureTimer=null; }
+    if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; }
     clearFrames();
     setStatus("Bereit");
   }
 
+  async function waitForPlaying(video, timeoutMs=4000){
+    const start=performance.now();
+    while (video.readyState < 2 || video.paused){
+      try{ await video.play(); }catch(e){}
+      await new Promise(r=>setTimeout(r, 80));
+      if(performance.now()-start > timeoutMs) break;
+    }
+  }
+
   async function startCam(){
-    const p = preset();
+    const p=preset();
     setStatus("Start…");
 
     stream = await navigator.mediaDevices.getUserMedia({
       audio:false,
       video:{
         facingMode:{ ideal:facing },
-        width:{ ideal:p.w },
-        height:{ ideal:p.h },
+        width:{ ideal:p.w }, height:{ ideal:p.h },
         frameRate:{ ideal:p.fps, max:p.fps }
       }
     });
 
-    live.srcObject = stream;
-    await new Promise(r => live.onloadedmetadata = r);
+    live.srcObject=stream;
+    live.muted=true;
+    live.playsInline=true;
 
-    out.width  = live.videoWidth;
-    out.height = live.videoHeight;
+    await new Promise(r=>live.onloadedmetadata=r);
+    await waitForPlaying(live, 6000);
 
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = "high";
+    // If video still not providing sizes, fallback
+    const vw = live.videoWidth || p.w;
+    const vh = live.videoHeight || p.h;
 
-    running=true;
-    frozen=false;
+    out.width = vw;
+    out.height = vh;
 
-    clearFrames();
-    resetTracking();
+    // capture canvas uses actual video size
+    captureCanvas.width = vw;
+    captureCanvas.height = vh;
+
+    ctx.imageSmoothingEnabled=true;
+    ctx.imageSmoothingQuality="high";
+
+    running=true; frozen=false;
+    clearFrames(); resetTracking();
     setStatus("Läuft");
 
-    const interval = Math.max(10, Math.round(1000 / p.fps));
+    const interval=Math.max(20, Math.round(1000/p.fps));
 
-    captureTimer = setInterval(async () => {
+    captureTimer=setInterval(()=>{
       if(!running) return;
-      try{
-        const bmp = await createImageBitmap(live);
-        frames.push({ t: Date.now(), bmp });
 
-        const delaySec = Number(delaySlider.value);
-        const maxFrames = Math.ceil((delaySec + 2) * p.fps);
-        while(frames.length > maxFrames){
-          const old = frames.shift();
-          old?.bmp?.close?.();
-        }
-      }catch(e){}
+      // Draw current video frame onto captureCanvas
+      try{
+        captureCtx.drawImage(live, 0, 0, vw, vh);
+        // Extract ImageData (buffer)
+        const img = captureCtx.getImageData(0,0,vw,vh);
+        frames.push({ t: Date.now(), img });
+
+        const delaySec=Number(delaySlider.value);
+        const maxFrames=Math.ceil((delaySec+2)*p.fps);
+        while(frames.length>maxFrames) frames.shift();
+      }catch(e){
+        // If drawImage fails (rare), show useful status once
+        setStatus("Kamera-Frame Fehler (Browser)");
+      }
     }, interval);
 
-    function draw(){
+    function drawLoop(){
       if(!running) return;
 
       if(!frozen){
-        const delaySec = Number(delaySlider.value);
-        const targetTime = Date.now() - delaySec*1000;
-        const f = pickFrameAtOrBefore(targetTime);
+        const delaySec=Number(delaySlider.value);
+        const targetTime=Date.now() - delaySec*1000;
+        const f=pickFrameAtOrBefore(targetTime);
         if(f){
-          processTrackingOnFrame(f.bmp);
-          ctx.drawImage(f.bmp, 0, 0, out.width, out.height);
+          processTrackingOnFrame(f.img);
+          drawZoomedImageData(f.img);
           drawHoldOverlay();
+        }else{
+          // if buffer not ready, draw live directly (no delay yet)
+          ctx.drawImage(live,0,0,out.width,out.height);
         }
       }
-
-      requestAnimationFrame(draw);
+      requestAnimationFrame(drawLoop);
     }
-    requestAnimationFrame(draw);
+    requestAnimationFrame(drawLoop);
   }
 
-  window.addEventListener("pagehide", () => stopCam());
+  btnStart.onclick=async()=>{
+    if(running) return;
+    haptic(22);
+    try{ await startCam(); }
+    catch(e){
+      console.error(e);
+      setStatus("Kamera blockiert / keine Berechtigung");
+    }
+  };
 
-  // Init
+  window.addEventListener("pagehide", ()=>stopCam());
   setStatus("Bereit");
 </script>
 </body>
 </html>
-
-
