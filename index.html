@@ -3,280 +3,848 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Video Delay</title>
+  <title>Delay Cam</title>
   <style>
     :root{
-      --bg:#0b0f17; --card:#111827; --muted:#9ca3af; --text:#e5e7eb;
-      --accent:#60a5fa; --border:#243244;
+      --bg:#0b0f14; --panel:#0f141a; --border:#1f2a37;
+      --text:#e6edf3; --muted:#9aa4b2; --btn:#121a24; --btnOn:#1a2635;
       --radius:16px;
     }
     *{box-sizing:border-box}
     body{
-      margin:0; padding:14px; background:var(--bg); color:var(--text);
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      margin:0; padding:12px;
+      background:var(--bg); color:var(--text);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
     }
-    .wrap{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
-    .card{
-      background:var(--card); border:1px solid var(--border);
-      border-radius:var(--radius); padding:12px;
+    .wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+    .bar{
+      background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+      padding:12px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;
     }
-    h1{font-size:18px;margin:0 0 8px 0}
-    .muted{color:var(--muted); font-size:13px; line-height:1.35}
-    .controls{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .left,.right{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
     button{
-      background:#1f2937; color:var(--text); border:1px solid var(--border);
-      padding:10px 12px; border-radius:14px; font-size:14px;
+      appearance:none; border:1px solid var(--border); background:var(--btn); color:var(--text);
+      border-radius:14px; padding:14px 16px; min-height:48px; min-width:120px;
+      font-size:clamp(14px,2.2vw,18px); line-height:1; touch-action:manipulation;
     }
-    button.primary{border-color:#2d4a70; background:#0f2742}
+    button.on{background:var(--btnOn)}
+    button.icon{min-width:56px;padding:14px 0;text-align:center}
     button:active{transform:translateY(1px)}
-    label{display:flex; align-items:center; gap:10px}
-    input[type="range"]{width:220px}
-    .pill{padding:6px 10px;border:1px solid var(--border);border-radius:999px;font-size:13px;color:var(--muted)}
+    button:disabled{opacity:.55}
+
+    .pill{
+      border:1px solid var(--border); border-radius:999px; padding:10px 12px; min-height:48px;
+      display:flex; align-items:center; color:var(--muted); font-size:clamp(12px,2vw,15px);
+    }
+
     .stage{
-      position:relative; overflow:hidden; border-radius:var(--radius);
-      border:1px solid var(--border); background:#000;
+      background:#000; border:1px solid var(--border); border-radius:var(--radius);
+      overflow:hidden; position:relative;
     }
-    canvas{width:100%; height:auto; display:block; background:#000}
-    .overlay{
-      position:absolute; inset:auto 10px 10px 10px;
-      display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between; align-items:center;
-      pointer-events:none;
+    #out{width:100%;height:auto;display:block;background:#000}
+    video{display:none}
+
+    /* Modal */
+    .modalBack{
+      position:fixed; inset:0; background:rgba(0,0,0,.55);
+      display:none; align-items:flex-end; justify-content:center; padding:12px;
     }
-    .overlay > *{pointer-events:auto}
-    .miniLive{
-      position:absolute; top:10px; right:10px;
-      width:min(160px, 38vw); aspect-ratio: 3 / 4;
-      border-radius:14px; overflow:hidden; border:1px solid var(--border);
-      background:#000;
+    .modalBack.show{display:flex}
+    .modal{
+      width:min(820px,100%); background:var(--panel); border:1px solid var(--border);
+      border-radius:18px; overflow:hidden;
     }
-    video{width:100%; height:100%; object-fit:cover; display:block}
-    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between}
-    .status{font-size:13px;color:var(--muted)}
-    .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; opacity:.8}
-    .hidden{display:none !important;}
+    .modalHeader{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px; border-bottom:1px solid var(--border);
+    }
+    .modalTitle{color:var(--text); font-size:16px; opacity:.95}
+    .modalBody{padding:12px; display:flex; flex-direction:column; gap:12px}
+    .row{display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:space-between}
+    label{color:var(--muted); font-size:14px}
+    input[type="range"]{width:min(520px,78vw)}
+    select{
+      background:var(--btn); color:var(--text); border:1px solid var(--border);
+      border-radius:12px; padding:12px; min-height:44px; font-size:14px;
+    }
+    .smallBtn{min-width:160px}
+    .hint{color:var(--muted); font-size:13px; line-height:1.35}
+
+    /* Heatmap canvas fits on screen */
+    .heatWrap{
+      background:#0a0e13; border:1px solid var(--border); border-radius:14px; overflow:hidden;
+      width:100%;
+    }
+    #heatView{
+      width:100%;
+      height:min(70vh, 720px);
+      display:block;
+      background:#0a0e13;
+      touch-action: manipulation;
+    }
+
+    .overlayTip{
+      position:absolute; left:10px; right:10px; bottom:10px;
+      background:rgba(15,20,26,.88); border:1px solid rgba(31,42,55,.95);
+      padding:10px 12px; border-radius:14px;
+      color:var(--text); font-size:14px;
+      display:none;
+    }
+    .overlayTip.show{display:block}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <h1>Video Delay (Bowling)</h1>
-      <div class="muted">
-        Tipp: Handy quer auf Stativ. Unten siehst du den verzögerten Wurf, rechts oben klein das Live-Bild.
-      </div>
+<div class="wrap">
+
+  <div class="bar">
+    <div class="left">
+      <button id="start" class="on">Start</button>
+      <button id="freeze">Freeze</button>
+      <button id="fs">Vollbild</button>
+      <button id="menu" class="icon" aria-label="Menü">⋯</button>
     </div>
-
-    <div class="card">
-      <div class="controls">
-        <button id="start" class="primary">Start</button>
-        <button id="freeze">Freeze</button>
-        <button id="swap">Kamera wechseln</button>
-        <button id="fs">Vollbild</button>
-
-        <label>
-          Delay
-          <input id="delay" type="range" min="1" max="30" value="10" />
-          <span class="pill"><span id="dLabel">10</span>s</span>
-        </label>
-
-        <label>
-          Qualität
-          <input id="quality" type="range" min="0" max="2" value="1" />
-          <span class="pill" id="qLabel">High</span>
-        </label>
-
-        <span class="status" id="status">Bereit.</span>
-      </div>
-      <div class="muted" style="margin-top:8px">
-        Qualität: <span class="kbd">Medium</span> ist meist flüssiger. <span class="kbd">Ultra</span> kann ruckeln.
-      </div>
-    </div>
-
-    <div class="stage" id="stage">
-      <canvas id="out"></canvas>
-
-      <div class="miniLive" id="miniLive">
-        <video id="live" playsinline autoplay muted></video>
-      </div>
-
-      <div class="overlay">
-        <span class="pill" id="infoPill">Delay aktiv</span>
-        <span class="pill" id="fpsPill">FPS: –</span>
-      </div>
+    <div class="right">
+      <div class="pill" id="status">Bereit</div>
     </div>
   </div>
 
-<script>
-  const live = document.getElementById('live');
-  const out = document.getElementById('out');
-  const ctx = out.getContext('2d', { alpha:false });
+  <div class="stage" id="stage">
+    <canvas id="out"></canvas>
+    <video id="live" playsinline autoplay muted></video>
+    <div id="tapTip" class="overlayTip"></div>
+  </div>
 
+</div>
+
+<!-- Menü -->
+<div class="modalBack" id="menuBack">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="Menü">
+    <div class="modalHeader">
+      <div class="modalTitle">Menü</div>
+      <button id="menuClose" class="icon" aria-label="Schließen">✕</button>
+    </div>
+    <div class="modalBody">
+
+      <div class="row">
+        <label for="delay">Delay</label>
+        <div class="pill"><b><span id="dLabel">10</span>s</b></div>
+      </div>
+      <div class="row">
+        <input id="delay" type="range" min="1" max="30" value="10" />
+      </div>
+
+      <div class="row">
+        <label for="quality">Qualität</label>
+        <select id="quality">
+          <option value="0">Medium (720p)</option>
+          <option value="1" selected>Hoch (1080p)</option>
+          <option value="2">Ultra (1440p)</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <button id="switchCam" class="smallBtn">Kamera wechseln</button>
+        <button id="viewHeat" class="smallBtn">Heatmap ansehen</button>
+        <button id="calib" class="smallBtn">Kalibrieren</button>
+      </div>
+
+      <div class="hint">
+        Kalibrieren: Tippe im Video 4 Bahnecken an:
+        <b>nah links</b> → <b>nah rechts</b> → <b>fern rechts</b> → <b>fern links</b>.
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Heatmap -->
+<div class="modalBack" id="heatBack">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="Heatmap">
+    <div class="modalHeader">
+      <div class="modalTitle">Heatmap (letzte <span id="heatN">10</span> Würfe)</div>
+      <button id="heatClose" class="icon" aria-label="Schließen">✕</button>
+    </div>
+    <div class="modalBody">
+      <div class="heatWrap">
+        <canvas id="heatView"></canvas>
+      </div>
+      <div class="row">
+        <button id="clearHeat" class="smallBtn">Zurücksetzen</button>
+        <button id="set10" class="smallBtn on">Letzte 10</button>
+        <button id="set25" class="smallBtn">Letzte 25</button>
+      </div>
+      <div class="hint">Tippe auf die Heatmap, um die Animation erneut abzuspielen.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Elements
+  const live = document.getElementById('live');
+  const out  = document.getElementById('out');
+  const ctx  = out.getContext('2d', { alpha:false });
   const stage = document.getElementById('stage');
-  const btnStart = document.getElementById('start');
+
+  const btnStart  = document.getElementById('start');
   const btnFreeze = document.getElementById('freeze');
-  const btnSwap = document.getElementById('swap');
-  const btnFs = document.getElementById('fs');
+  const btnFs     = document.getElementById('fs');
+  const statusEl  = document.getElementById('status');
+
+  const btnMenu = document.getElementById('menu');
+  const menuBack = document.getElementById('menuBack');
+  const menuClose = document.getElementById('menuClose');
 
   const delaySlider = document.getElementById('delay');
   const dLabel = document.getElementById('dLabel');
+  const qualitySelect = document.getElementById('quality');
+  const btnSwitchCam = document.getElementById('switchCam');
 
-  const qSlider = document.getElementById('quality');
-  const qLabel = document.getElementById('qLabel');
+  const btnViewHeat = document.getElementById('viewHeat');
+  const btnCalib = document.getElementById('calib');
 
-  const statusEl = document.getElementById('status');
-  const infoPill = document.getElementById('infoPill');
-  const fpsPill = document.getElementById('fpsPill');
+  const heatBack = document.getElementById('heatBack');
+  const heatClose = document.getElementById('heatClose');
+  const heatView = document.getElementById('heatView');
+  const heatCtx = heatView.getContext('2d', { alpha:false });
+  const heatNLabel = document.getElementById('heatN');
+  const btnClearHeat = document.getElementById('clearHeat');
+  const btnSet10 = document.getElementById('set10');
+  const btnSet25 = document.getElementById('set25');
 
+  const tapTip = document.getElementById('tapTip');
+
+  // Feedback
+  function haptic(ms=18){ try{ if (navigator.vibrate) navigator.vibrate(ms); }catch(e){} }
+  let audioCtx=null;
+  function beep(freq=880, durMs=40){
+    try{
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type="sine"; o.frequency.value=freq;
+      g.gain.value=0.03;
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start();
+      setTimeout(()=>{ o.stop(); o.disconnect(); g.disconnect(); }, durMs);
+    }catch(e){}
+  }
+
+  // State
   let stream = null;
   let running = false;
   let frozen = false;
+  let facing = "environment";
+  let captureTimer = null;
+  let frames = []; // delay buffer
 
-  // 0=Medium, 1=High, 2=Ultra
-  const qualityPresets = [
-    { name: "Medium", width: 1280, height: 720,  fps: 24 },
-    { name: "High",   width: 1920, height: 1080, fps: 30 },
-    { name: "Ultra",  width: 2560, height: 1440, fps: 30 }
+  const presets = [
+    { name:"Medium", w:1280, h:720,  fps:24 },
+    { name:"Hoch",   w:1920, h:1080, fps:30 },
+    { name:"Ultra",  w:2560, h:1440, fps:30 }
   ];
-
-  let facing = "environment"; // Rückkamera default
-  dLabel.textContent = delaySlider.value;
+  function preset(){ return presets[Number(qualitySelect.value)]; }
 
   function setStatus(t){ statusEl.textContent = t; }
+  function clamp(v,a,b){ return Math.max(a, Math.min(b,v)); }
 
-  function qualityPreset() {
-    const p = qualityPresets[Number(qSlider.value)];
-    qLabel.textContent = p.name;
-    return p;
+  function clearFrames(){
+    for (const f of frames) f.bmp?.close?.();
+    frames.length = 0;
   }
-  qualityPreset();
 
-  delaySlider.oninput = () => dLabel.textContent = delaySlider.value;
-  qSlider.oninput = () => qualityPreset();
+  function pickFrameAtOrBefore(targetTime){
+    if (!frames.length) return null;
+    let lo=0, hi=frames.length-1, best=-1;
+    while (lo<=hi){
+      const mid=(lo+hi)>>1;
+      if (frames[mid].t <= targetTime){ best=mid; lo=mid+1; }
+      else hi=mid-1;
+    }
+    return best>=0 ? frames[best] : frames[0];
+  }
 
-  btnFreeze.onclick = () => {
-    frozen = !frozen;
-    btnFreeze.textContent = frozen ? "Unfreeze" : "Freeze";
-    infoPill.textContent = frozen ? "Freeze aktiv" : "Delay aktiv";
+  // Tracking
+  const aW=200, aH=112;
+  const aCan=document.createElement('canvas');
+  aCan.width=aW; aCan.height=aH;
+  const aCtx=aCan.getContext('2d',{willReadFrequently:true});
+  let prevGray=null;
+
+  let currentPath = [];
+  let holdPathUntil = 0;
+  let missCount = 0;
+  const MISS_END_FRAMES = 10;
+
+  let throwStore = [];
+  let keepLastN = 10;
+
+  function resetTracking(){
+    prevGray=null;
+    missCount=0;
+    currentPath=[];
+    holdPathUntil=0;
+  }
+
+  function detectBallPointFromBitmap(bmp){
+    aCtx.drawImage(bmp,0,0,aW,aH);
+    const img=aCtx.getImageData(0,0,aW,aH);
+    const data=img.data;
+
+    const gray=new Uint8Array(aW*aH);
+    for(let i=0,j=0;i<data.length;i+=4,j++){
+      gray[j]=(data[i]*3 + data[i+1]*4 + data[i+2]) >> 3;
+    }
+    if(!prevGray){ prevGray=gray; return null; }
+
+    const TH=22;
+    let sumW=0,sumX=0,sumY=0;
+    for(let y=0;y<aH;y++){
+      const row=y*aW;
+      for(let x=0;x<aW;x++){
+        const idx=row+x;
+        const d=Math.abs(gray[idx]-prevGray[idx]);
+        if(d>TH){
+          const w=d;
+          sumW+=w;
+          sumX+=w*x;
+          sumY+=w*y;
+        }
+      }
+    }
+    prevGray=gray;
+    if(sumW<14000) return null;
+
+    const cx=sumX/sumW, cy=sumY/sumW;
+    return { x:(cx/(aW-1))*out.width, y:(cy/(aH-1))*out.height };
+  }
+
+  function finalizeThrow(){
+    if (currentPath.length >= 6){
+      throwStore.push({ points: currentPath.map(p => ({x:p.x,y:p.y})), ts: Date.now() });
+      if (throwStore.length > keepLastN) throwStore = throwStore.slice(-keepLastN);
+    }
+  }
+
+  function processTrackingOnFrame(bmp){
+    const now=Date.now();
+    if (holdPathUntil && now < holdPathUntil) return;
+
+    const pt = detectBallPointFromBitmap(bmp);
+    if(!pt){
+      missCount++;
+      if(currentPath.length>10 && missCount>=MISS_END_FRAMES){
+        finalizeThrow();
+        holdPathUntil = now + 3000;
+        missCount = 0;
+      }
+      return;
+    }
+
+    missCount=0;
+    if(holdPathUntil && now >= holdPathUntil){
+      currentPath=[];
+      holdPathUntil=0;
+    }
+
+    const last=currentPath[currentPath.length-1];
+    const minDist=Math.max(2, Math.min(out.width,out.height)*0.004);
+    if(!last || Math.hypot(pt.x-last.x, pt.y-last.y) > minDist){
+      currentPath.push({x:pt.x,y:pt.y});
+    }
+    if(currentPath.length>900) currentPath.shift();
+  }
+
+  function drawHoldOverlay(){
+    const now=Date.now();
+    const holding = holdPathUntil && now < holdPathUntil;
+    if (!holding || currentPath.length < 2) return;
+
+    ctx.save();
+    ctx.lineJoin="round";
+    ctx.lineCap="round";
+
+    ctx.lineWidth = Math.max(3, Math.min(out.width,out.height)*0.006);
+    ctx.strokeStyle="rgba(0,0,0,0.55)";
+    ctx.beginPath();
+    ctx.moveTo(currentPath[0].x,currentPath[0].y);
+    for(let i=1;i<currentPath.length;i++) ctx.lineTo(currentPath[i].x,currentPath[i].y);
+    ctx.stroke();
+
+    ctx.lineWidth = Math.max(2, Math.min(out.width,out.height)*0.004);
+    ctx.strokeStyle="rgba(255,255,255,0.92)";
+    ctx.beginPath();
+    ctx.moveTo(currentPath[0].x,currentPath[0].y);
+    for(let i=1;i<currentPath.length;i++) ctx.lineTo(currentPath[i].x,currentPath[i].y);
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  // Calibration (optional)
+  let calibActive = false;
+  let calibPts = [];
+  let H = null;
+
+  function showTip(t){ tapTip.textContent = t; tapTip.classList.add('show'); }
+  function hideTip(){ tapTip.classList.remove('show'); }
+
+  function computeHomography(src4, dst4){
+    const A = [];
+    const b = [];
+    for (let i=0;i<4;i++){
+      const x = src4[i].x, y = src4[i].y;
+      const u = dst4[i].x, v = dst4[i].y;
+      A.push([x,y,1, 0,0,0, -u*x, -u*y]); b.push(u);
+      A.push([0,0,0, x,y,1, -v*x, -v*y]); b.push(v);
+    }
+    const n=8;
+    const M = A.map((row,i)=>row.concat([b[i]]));
+    for(let col=0; col<n; col++){
+      let pivot=col;
+      for(let r=col+1;r<n;r++){
+        if (Math.abs(M[r][col]) > Math.abs(M[pivot][col])) pivot=r;
+      }
+      const tmp=M[col]; M[col]=M[pivot]; M[pivot]=tmp;
+      const div = M[col][col] || 1e-12;
+      for(let c=col;c<=n;c++) M[col][c] /= div;
+      for(let r=0;r<n;r++){
+        if(r===col) continue;
+        const factor = M[r][col];
+        for(let c=col;c<=n;c++) M[r][c] -= factor * M[col][c];
+      }
+    }
+    const h = M.map(row=>row[n]);
+    return [
+      [h[0], h[1], h[2]],
+      [h[3], h[4], h[5]],
+      [h[6], h[7], 1]
+    ];
+  }
+
+  function applyH(H, x, y){
+    const a = H[0][0]*x + H[0][1]*y + H[0][2];
+    const b = H[1][0]*x + H[1][1]*y + H[1][2];
+    const c = H[2][0]*x + H[2][1]*y + H[2][2];
+    return { x: a/c, y: b/c };
+  }
+
+  function startCalib(){
+    calibActive = true;
+    calibPts = [];
+    H = null;
+    showTip("Kalibrieren: Tippe nah links.");
+    closeMenu();
+  }
+
+  // Heatmap sizing
+  function resizeHeatCanvas(){
+    const cssW = heatView.clientWidth || 600;
+    const cssH = heatView.clientHeight || 600;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const w = Math.max(300, Math.round(cssW * dpr));
+    const h = Math.max(300, Math.round(cssH * dpr));
+    if (heatView.width !== w || heatView.height !== h){
+      heatView.width = w;
+      heatView.height = h;
+    }
+  }
+
+  // Proper lane proportions
+  function laneMetrics(){
+    // Realistic ratio: length / width ≈ 17.35
+    const R = 17.35;
+
+    const topPad = Math.round(heatView.height * 0.06);
+    const bottomPad = Math.round(heatView.height * 0.04);
+    const laneH = Math.max(200, heatView.height - topPad - bottomPad);
+
+    const maxW = Math.round(heatView.width * 0.82);
+    const laneW = Math.max(180, Math.min(maxW, Math.round(laneH / R)));
+
+    const laneX = Math.round((heatView.width - laneW) / 2);
+    const laneY = topPad;
+
+    return { laneX, laneY, laneW, laneH };
+  }
+
+  // Heatmap drawing (animated)
+  let heatAnimId = null;
+
+  function drawLaneBackground(){
+    heatCtx.fillStyle = "#0a0e13";
+    heatCtx.fillRect(0,0,heatView.width,heatView.height);
+
+    const lane = laneMetrics();
+
+    // gutters + lane
+    const gutterW = lane.laneW * 0.18;
+    heatCtx.fillStyle = "#0b1118";
+    heatCtx.fillRect(lane.laneX - gutterW, lane.laneY, gutterW, lane.laneH);
+    heatCtx.fillRect(lane.laneX + lane.laneW, lane.laneY, gutterW, lane.laneH);
+
+    heatCtx.fillStyle = "#0e141c";
+    heatCtx.fillRect(lane.laneX, lane.laneY, lane.laneW, lane.laneH);
+
+    heatCtx.strokeStyle = "#223041";
+    heatCtx.lineWidth = Math.max(2, Math.round(heatView.width * 0.004));
+    heatCtx.strokeRect(lane.laneX, lane.laneY, lane.laneW, lane.laneH);
+
+    // boards (subtle)
+    heatCtx.strokeStyle = "rgba(255,255,255,0.06)";
+    heatCtx.lineWidth = 1;
+    const boards = 39;
+    for(let i=1;i<boards;i++){
+      const x = lane.laneX + (i/boards)*lane.laneW;
+      heatCtx.beginPath();
+      heatCtx.moveTo(x, lane.laneY);
+      heatCtx.lineTo(x, lane.laneY + lane.laneH);
+      heatCtx.stroke();
+    }
+
+    // foul line (near bottom)
+    const foulY = lane.laneY + lane.laneH * 0.86;
+    heatCtx.strokeStyle = "rgba(255,255,255,0.20)";
+    heatCtx.lineWidth = Math.max(2, Math.round(heatView.width * 0.006));
+    heatCtx.beginPath();
+    heatCtx.moveTo(lane.laneX, foulY);
+    heatCtx.lineTo(lane.laneX + lane.laneW, foulY);
+    heatCtx.stroke();
+
+    // rangefinder dots
+    const dotsY1 = lane.laneY + lane.laneH * 0.78;
+    const dotsY2 = lane.laneY + lane.laneH * 0.72;
+    const dotBoards = [7, 13, 19, 25, 31];
+    heatCtx.fillStyle = "rgba(255,255,255,0.18)";
+    const dotR = Math.max(2, Math.round(heatView.width * 0.0055));
+    for (const b of dotBoards){
+      const x = lane.laneX + (b/39) * lane.laneW;
+      heatCtx.beginPath(); heatCtx.arc(x, dotsY1, dotR, 0, Math.PI*2); heatCtx.fill();
+      heatCtx.beginPath(); heatCtx.arc(x, dotsY2, dotR, 0, Math.PI*2); heatCtx.fill();
+    }
+
+    // arrows
+    const arrowsY = lane.laneY + lane.laneH * 0.64;
+    const arrowBoards = [5, 10, 15, 20, 25, 30, 35];
+    const aw = lane.laneW * 0.04;
+    const ah = lane.laneW * 0.04;
+    heatCtx.fillStyle = "rgba(255,255,255,0.16)";
+    for (const b of arrowBoards){
+      const cx = lane.laneX + (b/39) * lane.laneW;
+      heatCtx.beginPath();
+      heatCtx.moveTo(cx, arrowsY - ah);
+      heatCtx.lineTo(cx - aw, arrowsY + ah);
+      heatCtx.lineTo(cx + aw, arrowsY + ah);
+      heatCtx.closePath();
+      heatCtx.fill();
+    }
+
+    // pin deck marker
+    const pinDeckY = lane.laneY + lane.laneH * 0.10;
+    heatCtx.strokeStyle = "rgba(255,255,255,0.12)";
+    heatCtx.lineWidth = Math.max(1, Math.round(heatView.width * 0.004));
+    heatCtx.beginPath();
+    heatCtx.moveTo(lane.laneX, pinDeckY);
+    heatCtx.lineTo(lane.laneX + lane.laneW, pinDeckY);
+    heatCtx.stroke();
+
+    // pins – correct orientation (headpin lower in the cluster)
+    const pinCenterX = lane.laneX + lane.laneW * 0.50;
+    const pinDeckTop    = lane.laneY + lane.laneH * 0.04;
+    const pinDeckBottom = lane.laneY + lane.laneH * 0.12;
+
+    const pinDy = (pinDeckBottom - pinDeckTop) / 3;
+    const pinDx = lane.laneW * 0.10;
+    const pinR  = Math.max(2, Math.round(heatView.width * 0.0065));
+
+    heatCtx.fillStyle = "rgba(255,255,255,0.22)";
+    const rows = [
+      [-1.5, -0.5, 0.5, 1.5],
+      [-1, 0, 1],
+      [-0.5, 0.5],
+      [0]
+    ];
+    for (let r=0; r<rows.length; r++){
+      const y = pinDeckTop + r * pinDy;
+      for (const off of rows[r]){
+        const x = pinCenterX + off * pinDx;
+        heatCtx.beginPath();
+        heatCtx.arc(x, y, pinR, 0, Math.PI*2);
+        heatCtx.fill();
+      }
+    }
+
+    // label
+    heatCtx.fillStyle = "rgba(154,164,178,0.92)";
+    heatCtx.font = `${Math.max(12, Math.round(heatView.width*0.03))}px system-ui, -apple-system, Segoe UI, Roboto, sans-serif`;
+    heatCtx.fillText(H ? "Kalibriert" : "Nicht kalibriert", Math.round(heatView.width*0.07), Math.round(heatView.height*0.08));
+
+    return lane;
+  }
+
+  function drawOneThrowTopDown(throwObj, progress01, index, total, lane){
+    const pts = throwObj.points;
+    if (!pts || pts.length < 2) return;
+
+    const age = (total - 1 - index);
+    const alpha = Math.max(0.18, 0.62 - age * 0.06);
+
+    heatCtx.save();
+    heatCtx.lineJoin = "round";
+    heatCtx.lineCap  = "round";
+    heatCtx.lineWidth = Math.max(2, lane.laneW * 0.08);
+    heatCtx.strokeStyle = `rgba(255,255,255,${alpha})`;
+
+    const maxK = Math.max(1, Math.floor((pts.length - 1) * clamp(progress01,0,1)));
+
+    heatCtx.beginPath();
+    for (let k=0; k<=maxK; k++){
+      const p = pts[k];
+
+      let uv;
+      if (H) uv = applyH(H, p.x, p.y);
+      else uv = { x: p.x / out.width, y: p.y / out.height };
+
+      const u = clamp(uv.x, 0, 1);
+      const v = clamp(uv.y, 0, 1);
+
+      const x = lane.laneX + u * lane.laneW;
+      const y = lane.laneY + v * lane.laneH;
+
+      if (k === 0) heatCtx.moveTo(x, y);
+      else heatCtx.lineTo(x, y);
+    }
+    heatCtx.stroke();
+    heatCtx.restore();
+  }
+
+  function startHeatAnimation(){
+    if (heatAnimId) cancelAnimationFrame(heatAnimId);
+    heatAnimId = null;
+
+    resizeHeatCanvas();
+
+    const throws = throwStore.slice(-keepLastN);
+    const total = throws.length;
+
+    const msPerThrow = 260;
+    const msPerLine  = 420;
+    const startT = performance.now();
+
+    function frame(now){
+      const lane = drawLaneBackground();
+
+      const elapsed = now - startT;
+      const fullCount = Math.min(total, Math.floor(elapsed / msPerThrow));
+
+      for (let i=0; i<fullCount; i++){
+        drawOneThrowTopDown(throws[i], 1, i, total, lane);
+      }
+
+      const idx = fullCount;
+      if (idx < total){
+        const t0 = idx * msPerThrow;
+        const p = (elapsed - t0) / msPerLine;
+        drawOneThrowTopDown(throws[idx], p, idx, total, lane);
+        heatAnimId = requestAnimationFrame(frame);
+      } else {
+        heatAnimId = null;
+      }
+    }
+
+    heatAnimId = requestAnimationFrame(frame);
+  }
+
+  heatView.addEventListener('click', () => startHeatAnimation());
+  window.addEventListener('resize', () => { if (heatBack.classList.contains('show')) startHeatAnimation(); });
+
+  // Modals
+  function openMenu(){ menuBack.classList.add('show'); }
+  function closeMenu(){ menuBack.classList.remove('show'); }
+  btnMenu.onclick = () => { haptic(); beep(650,25); openMenu(); };
+  menuClose.onclick = () => { haptic(); beep(520,25); closeMenu(); };
+  menuBack.addEventListener('click', (e) => { if (e.target === menuBack) closeMenu(); });
+
+  function openHeat(){
+    heatBack.classList.add('show');
+    heatNLabel.textContent = String(keepLastN);
+    startHeatAnimation();
+  }
+  function closeHeat(){
+    heatBack.classList.remove('show');
+    if (heatAnimId) cancelAnimationFrame(heatAnimId);
+    heatAnimId = null;
+  }
+  heatClose.onclick = () => { haptic(); beep(520,25); closeHeat(); };
+  heatBack.addEventListener('click', (e) => { if (e.target === heatBack) closeHeat(); });
+
+  btnViewHeat.onclick = () => { haptic(); beep(820,30); closeMenu(); openHeat(); };
+  btnCalib.onclick = () => { haptic(); beep(820,35); startCalib(); };
+
+  // Settings
+  dLabel.textContent = delaySlider.value;
+  delaySlider.oninput = () => { dLabel.textContent = delaySlider.value; };
+
+  btnSet10.onclick = () => {
+    keepLastN = 10;
+    btnSet10.classList.add('on');
+    btnSet25.classList.remove('on');
+    if (throwStore.length > keepLastN) throwStore = throwStore.slice(-keepLastN);
+    heatNLabel.textContent = "10";
+    startHeatAnimation();
+  };
+  btnSet25.onclick = () => {
+    keepLastN = 25;
+    btnSet25.classList.add('on');
+    btnSet10.classList.remove('on');
+    if (throwStore.length > keepLastN) throwStore = throwStore.slice(-keepLastN);
+    heatNLabel.textContent = "25";
+    startHeatAnimation();
+  };
+  btnClearHeat.onclick = () => {
+    haptic(28); beep(420,60);
+    throwStore = [];
+    resetTracking();
+    startHeatAnimation();
   };
 
-  btnSwap.onclick = async () => {
-    facing = (facing === "environment") ? "user" : "environment";
-    if (running) {
-      await stopCam();
-      await startCam();
+  // Calibration click (stage)
+  stage.addEventListener('click', (e) => {
+    if (!calibActive) return;
+
+    const rect = out.getBoundingClientRect();
+    const x = (e.clientX - rect.left) * (out.width / rect.width);
+    const y = (e.clientY - rect.top)  * (out.height / rect.height);
+    calibPts.push({x,y});
+
+    if (calibPts.length === 1) showTip("Tippe nah rechts.");
+    else if (calibPts.length === 2) showTip("Tippe fern rechts.");
+    else if (calibPts.length === 3) showTip("Tippe fern links.");
+    else if (calibPts.length === 4){
+      const dst = [{x:0,y:1},{x:1,y:1},{x:1,y:0},{x:0,y:0}];
+      H = computeHomography(calibPts, dst);
+      calibActive = false;
+      hideTip();
+      setStatus("Kalibriert");
+      beep(900,45);
     }
+  });
+
+  // Controls
+  btnSwitchCam.onclick = async () => {
+    haptic(); beep(740,30);
+    facing = (facing === "environment") ? "user" : "environment";
+    if (running){ await stopCam(); await startCam(); }
+  };
+
+  btnFreeze.onclick = () => {
+    haptic(28);
+    frozen = !frozen;
+    btnFreeze.classList.toggle('on', frozen);
+    btnFreeze.textContent = frozen ? "Weiter" : "Freeze";
+    beep(frozen ? 520 : 880, 45);
+    setStatus(frozen ? "Freeze" : (running ? "Läuft" : "Bereit"));
   };
 
   btnFs.onclick = async () => {
+    haptic(); beep(660,25);
     try{
       if (!document.fullscreenElement) await stage.requestFullscreen();
       else await document.exitFullscreen();
     }catch(e){
-      // iOS Safari kann Fullscreen eingeschränkt haben
-      setStatus("Vollbild wird von deinem Browser evtl. eingeschränkt.");
+      setStatus("Vollbild nicht verfügbar");
     }
   };
 
+  btnStart.onclick = async () => {
+    if (running) return;
+    haptic(22); beep(660,35);
+    try{ await startCam(); }
+    catch(e){ setStatus("Kamera blockiert"); }
+  };
+
   async function stopCam(){
-    running = false;
-    frozen = false;
-    btnFreeze.textContent = "Freeze";
-    infoPill.textContent = "Delay aktiv";
-    if (stream) {
-      stream.getTracks().forEach(t => t.stop());
-      stream = null;
-    }
+    running=false;
+    frozen=false;
+    btnFreeze.classList.remove('on');
+    btnFreeze.textContent="Freeze";
+    if (captureTimer){ clearInterval(captureTimer); captureTimer=null; }
+    if (stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; }
+    clearFrames();
+    setStatus("Bereit");
   }
 
   async function startCam(){
-    const q = qualityPreset();
-
-    setStatus("Kamera wird gestartet…");
+    const p = preset();
+    setStatus("Start…");
 
     stream = await navigator.mediaDevices.getUserMedia({
-      audio: false,
-      video: {
-        facingMode: { ideal: facing },
-        width:  { ideal: q.width },
-        height: { ideal: q.height },
-        frameRate: { ideal: q.fps, max: q.fps }
+      audio:false,
+      video:{
+        facingMode:{ ideal:facing },
+        width:{ ideal:p.w },
+        height:{ ideal:p.h },
+        frameRate:{ ideal:p.fps, max:p.fps }
       }
     });
 
     live.srcObject = stream;
     await new Promise(r => live.onloadedmetadata = r);
 
-    // Canvas echte Auflösung = Video-Auflösung (bessere Qualität)
     out.width  = live.videoWidth;
     out.height = live.videoHeight;
 
-    // Schärfer skalieren (wenn Browser es kann)
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = "high";
 
-    setStatus(`Läuft: ${facing === "environment" ? "Rückkamera" : "Frontkamera"} • ${out.width}x${out.height}`);
-    running = true;
+    running=true;
+    frozen=false;
 
-    // Buffer: wir speichern ImageBitmaps + Zeitstempel
-    const frames = [];
-    const times = [];
+    clearFrames();
+    resetTracking();
+    setStatus("Läuft");
 
-    // FPS-Tracking
-    let frameCount = 0;
-    let lastFpsTime = performance.now();
+    const interval = Math.max(10, Math.round(1000 / p.fps));
 
-    async function tick(){
-      if (!running) return;
-
-      // grob FPS messen
-      frameCount++;
-      const nowPerf = performance.now();
-      if (nowPerf - lastFpsTime >= 1000) {
-        fpsPill.textContent = `FPS: ${frameCount}`;
-        frameCount = 0;
-        lastFpsTime = nowPerf;
-      }
-
-      if (!frozen) {
+    captureTimer = setInterval(async () => {
+      if(!running) return;
+      try{
         const bmp = await createImageBitmap(live);
-        frames.push(bmp);
-        times.push(Date.now());
+        frames.push({ t: Date.now(), bmp });
 
         const delaySec = Number(delaySlider.value);
-        const maxFrames = Math.ceil((delaySec + 2) * q.fps);
-
-        while (frames.length > maxFrames) {
+        const maxFrames = Math.ceil((delaySec + 2) * p.fps);
+        while(frames.length > maxFrames){
           const old = frames.shift();
-          old?.close?.();
-          times.shift();
+          old?.bmp?.close?.();
         }
+      }catch(e){}
+    }, interval);
 
-        const targetTime = Date.now() - delaySec * 1000;
-        let idx = times.findIndex(t => t >= targetTime);
-        if (idx === -1) idx = 0;
+    function draw(){
+      if(!running) return;
 
-        ctx.drawImage(frames[idx], 0, 0, out.width, out.height);
+      if(!frozen){
+        const delaySec = Number(delaySlider.value);
+        const targetTime = Date.now() - delaySec*1000;
+        const f = pickFrameAtOrBefore(targetTime);
+        if(f){
+          processTrackingOnFrame(f.bmp);
+          ctx.drawImage(f.bmp, 0, 0, out.width, out.height);
+          drawHoldOverlay();
+        }
       }
 
-      requestAnimationFrame(tick);
+      requestAnimationFrame(draw);
     }
-
-    requestAnimationFrame(tick);
+    requestAnimationFrame(draw);
   }
 
-  btnStart.onclick = async () => {
-    try{
-      if (running) return;
-      await startCam();
-    }catch(e){
-      setStatus("Kamera-Start fehlgeschlagen. Erlaube Kamera & nutze am besten Chrome/Safari.");
-    }
-  };
+  window.addEventListener("pagehide", () => stopCam());
 
-  // Sicherheit: wenn Tab gewechselt wird, nicht weiterlaufen
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) fpsPill.textContent = "FPS: –";
-  });
+  // Init
+  setStatus("Bereit");
 </script>
 </body>
 </html>
+
 
